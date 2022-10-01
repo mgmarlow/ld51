@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useReducer } from "react";
+import { useEffect, useRef, useReducer } from "react";
+import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
 import "react-toastify/dist/ReactToastify.css";
@@ -120,6 +121,7 @@ const reducer = (state, action) => {
     case "log_valid_guess":
       return {
         ...state,
+        guess: "",
         score: state.score + getScore(action.payload),
         wordsGuessed: state.wordsGuessed.concat(action.payload),
         wordsGuessedThisCycle: state.wordsGuessedThisCycle + 1,
@@ -150,8 +152,9 @@ const reducer = (state, action) => {
   }
 };
 
-function Game({ onGameOver }) {
+function Game() {
   const [state, dispatch] = useReducer(reducer, getInitialState());
+  const navigate = useNavigate();
   const inputRef = useRef();
   const { score, lives, counter, guess, wordsGuessed, letterBank } = state;
 
@@ -176,7 +179,7 @@ function Game({ onGameOver }) {
 
   useEffect(() => {
     if (lives === 0) {
-      onGameOver(score);
+      navigate("/gameover", { state: score });
     }
   }, [lives]);
 
@@ -224,66 +227,61 @@ function Game({ onGameOver }) {
   );
 }
 
-function App() {
-  const [state, setState] = useState("menu");
-  const [finalScore, setFinalScore] = useState(0);
+function GameOver() {
+  const { state: finalScore } = useLocation();
+  const navigate = useNavigate();
 
   const handleClick = () => {
-    setState("play");
+    navigate("/play");
   };
 
-  const handleGameOver = (score) => {
-    setState("game_over");
-    setFinalScore(score);
+  return (
+    <div className="prose prose-xl prose-invert">
+      <h2>Game over.</h2>
+      <p>Your finished with a final score of:</p>
+      <p className="text-6xl">+{finalScore}</p>
+      <button className="font-bold" onClick={handleClick}>
+        Try again?
+      </button>
+    </div>
+  );
+}
+
+function Home() {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/play");
   };
 
-  const content = (() => {
-    switch (state) {
-      case "play":
-        return <Game onGameOver={handleGameOver} />;
+  return (
+    <div className="prose prose-xl prose-invert">
+      <h2>How to play</h2>
 
-      case "game_over":
-        return (
-          <div className="prose prose-xl prose-invert">
-            <h2>Game over.</h2>
-            <p>Your finished with a final score of:</p>
-            <p className="text-6xl">+{finalScore}</p>
-            <button className="font-bold" onClick={handleClick}>
-              Try again?
-            </button>
-          </div>
-        );
+      <p>
+        Enter as many words as you can using only the letters shown on screen.
+        Each word is worth an amount of score based on its length.
+      </p>
+      <ul>
+        <li>The letters shuffle randomly every 10 seconds.</li>
+        <li>
+          If the letters shuffle and you haven't submitted a word, game over!
+        </li>
+        <li>No duplicate words allowed.</li>
+        <li>Earn more points for encorporating harder letters.</li>
+      </ul>
 
-      case "menu":
-        return (
-          <div className="prose prose-xl prose-invert">
-            <h2>How to play</h2>
+      <button
+        className="border rounded mt-4 py-3 px-8 font-bold text-3xl"
+        onClick={handleClick}
+      >
+        Start
+      </button>
+    </div>
+  );
+}
 
-            <p>
-              Enter as many words as you can using only the letters shown on
-              screen. Each word is worth an amount of score based on its length.
-            </p>
-            <ul>
-              <li>The letters shuffle randomly every 10 seconds.</li>
-              <li>
-                If the letters shuffle and you haven't submitted a word, game
-                over!
-              </li>
-              <li>No duplicate words allowed.</li>
-              <li>Earn more points for encorporating harder letters.</li>
-            </ul>
-
-            <button
-              className="border rounded mt-4 py-3 px-8 font-bold text-3xl"
-              onClick={handleClick}
-            >
-              Start
-            </button>
-          </div>
-        );
-    }
-  })();
-
+function App() {
   return (
     <div>
       <div className="flex flex-col justify-between min-h-screen">
@@ -291,7 +289,11 @@ function App() {
           <h1 className="text-6xl mb-10 text-slate-100 font-bold">
             Shuffle Hussle
           </h1>
-          {content}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/play" element={<Game />} />
+            <Route path="/gameover" element={<GameOver />} />
+          </Routes>
         </div>
 
         <footer className="p-12">

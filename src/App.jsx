@@ -213,7 +213,7 @@ function Game() {
   }, []);
 
   if (timeRemaining === 0) {
-    return <Navigate to="/gameover" state={score} />;
+    return <Navigate to="/gameover" state={{ score, wordsGuessed }} />;
   }
 
   const handleSubmit = (e) => {
@@ -221,6 +221,14 @@ function Game() {
 
     const [valid, error] = isValidWord(guess, wordsGuessed, letterBank);
     if (valid) {
+      if (guess.length >= 5) {
+        toast.success("SPECTACULAR WORD!");
+      }
+
+      if (guess.includes("z") || guess.includes("q") || guess.includes("j")) {
+        toast.success("NICE JOB!");
+      }
+
       dispatch({ type: "log_valid_guess", payload: guess });
     } else {
       toast.error(error);
@@ -261,7 +269,8 @@ function Game() {
 }
 
 function GameOver() {
-  const { state: finalScore } = useLocation();
+  const { state } = useLocation();
+  const { score: finalScore, wordsGuessed } = state || {};
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -273,6 +282,7 @@ function GameOver() {
       <h2>Game over.</h2>
       <p>Your finished with a final score of:</p>
       <p className="text-6xl">+{finalScore}</p>
+      <p>You guessed: {wordsGuessed.join(", ")}.</p>
       <button className="font-bold" onClick={handleClick}>
         Try again?
       </button>

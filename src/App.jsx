@@ -302,16 +302,16 @@ function Home() {
       <h2>How to play</h2>
 
       <p>
-        Enter as many words using only the displayed letters before the timer
-        runs out. Every word entered gives you a tiny bit more breathing room.
-        What's the highest score you can reach?
+        Enter as many words as you can using only the displayed letters. Once
+        the timer runs out, you're toast! Luckily every word you submit gives
+        you a tiny bit more breathing room.
       </p>
+      <p>What's the highest score you can reach?</p>
       <ul>
         <li>The game is over once the countdown timer hits 0.</li>
         <li>Each new word extends the countdown timer.</li>
-        <li>Your letter bank shuffles randomly every 10 seconds.</li>
+        <li>The letter bank shuffles randomly every 10 seconds.</li>
         <li>No duplicates allowed!</li>
-        <li>Harder letters = more points.</li>
       </ul>
 
       <button

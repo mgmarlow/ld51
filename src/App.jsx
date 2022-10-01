@@ -1,14 +1,12 @@
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useRef, useReducer } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
 import "react-toastify/dist/ReactToastify.css";
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
-
 // Ordered by relative ease
 const vowels = "aeiou".split("");
-const consonants = "bcdfghklmnprstvwy".split("");
-const extrahard = "jqxz".split("");
+const consonants = "bcdfghklmnprsty".split("");
+const extrahard = "vwjqxz".split("");
 
 const hashedWordList = wordList
   .split("\n")
@@ -78,7 +76,7 @@ const Letter = ({ value }) => {
 
 const Letters = ({ letters }) => {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between space-x-4">
       {letters.map((l) => (
         <Letter key={l} value={l} />
       ))}
@@ -87,7 +85,14 @@ const Letters = ({ letters }) => {
 };
 
 const getScore = (word) => {
-  const base = word.length;
+  const base = word.split("").reduce((acc, cur) => {
+    if (extrahard.includes(cur)) {
+      return acc + 10;
+    } else {
+      return acc + 1;
+    }
+  }, 0);
+
   if (word.length > 5) {
     return base + 5;
   }
@@ -147,11 +152,16 @@ const reducer = (state, action) => {
 
 function Game({ onGameOver }) {
   const [state, dispatch] = useReducer(reducer, getInitialState());
+  const inputRef = useRef();
   const { score, lives, counter, guess, wordsGuessed, letterBank } = state;
 
   const handleChange = (e) => {
     dispatch({ type: "update_guess", payload: e.target.value });
   };
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   // TODO: Add letter flash on re-render
   useEffect(() => {
@@ -201,6 +211,7 @@ function Game({ onGameOver }) {
       <div>
         <form className="my-6" onSubmit={handleSubmit}>
           <input
+            ref={inputRef}
             className="text-3xl p-6 h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
             value={guess}
             onChange={handleChange}
@@ -215,7 +226,7 @@ function Game({ onGameOver }) {
 
 function App() {
   const [state, setState] = useState("menu");
-  const [finalScore, setFinalScore] = useState(100);
+  const [finalScore, setFinalScore] = useState(0);
 
   const handleClick = () => {
     setState("play");
@@ -235,7 +246,8 @@ function App() {
         return (
           <div className="prose prose-xl prose-invert">
             <h2>Game over.</h2>
-            <p>Your final score was +{finalScore}.</p>
+            <p>Your finished with a final score of:</p>
+            <p className="text-6xl">+{finalScore}</p>
             <button className="font-bold" onClick={handleClick}>
               Try again?
             </button>
@@ -245,8 +257,6 @@ function App() {
       case "menu":
         return (
           <div className="prose prose-xl prose-invert">
-            <h1>Shuffle Hussle</h1>
-
             <h2>How to play</h2>
 
             <p>
@@ -275,7 +285,21 @@ function App() {
 
   return (
     <div>
-      <div className="max-w-prose mx-auto my-10">{content}</div>
+      <div className="flex flex-col justify-between min-h-screen">
+        <div className="max-w-prose mx-auto my-10">
+          <h1 className="text-6xl mb-10 text-slate-100 font-bold">Shuffle Hussle</h1>
+          {content}
+        </div>
+
+        <footer className="p-12">
+          <div className="max-w-prose mx-auto">
+            A ld51 game by{" "}
+            <a className="font-bold" href="https://mgmarlow.com">
+              Graham Marlow
+            </a>
+          </div>
+        </footer>
+      </div>
 
       <ToastContainer position="bottom-left" theme="dark" />
     </div>

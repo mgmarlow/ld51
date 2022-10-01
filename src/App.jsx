@@ -36,7 +36,7 @@ const isValidWord = (word, alreadyGuessed, letters) => {
   }
 
   if (!wordContainsOnlyLetters(word, letters)) {
-    return [false, "Words can only contain displayed letters."];
+    return [false, "Word includes invalid letters."];
   }
 
   if (!!hashedWordList[word]) {
@@ -68,15 +68,54 @@ const getRandomLetters = () => {
   ];
 };
 
-const Letters = ({ letters }) => {
-  return <div>{letters.join(", ")}</div>;
+const Letter = ({ value }) => {
+  return (
+    <div className="bg-slate-600 text-slate-100 rounded inline w-16 h-16 flex justify-center items-center uppercase text-3xl">
+      {value}
+    </div>
+  );
 };
+
+const Letters = ({ letters }) => {
+  return (
+    <div className="flex justify-between">
+      {letters.map((l) => (
+        <Letter key={l} value={l} />
+      ))}
+    </div>
+  );
+};
+
+const getScore = (word) => {
+  const base = word.length;
+  if (word.length > 5) {
+    return base + 5;
+  }
+
+  return base;
+};
+
+const reversed = (arr) => arr.slice().reverse();
+
+const formatTime = (sec) => `00:00:${sec > 9 ? sec : "0" + sec}`;
+
+const getInitialState = () => ({
+  state: "play",
+  score: 0,
+  counter: 10,
+  lives: 1,
+  guess: "",
+  letterBank: getRandomLetters(),
+  wordsGuessed: [],
+  wordsGuessedThisCycle: 0,
+});
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "log_valid_guess":
       return {
         ...state,
+        score: state.score + getScore(action.payload),
         wordsGuessed: state.wordsGuessed.concat(action.payload),
         wordsGuessedThisCycle: state.wordsGuessedThisCycle + 1,
       };
@@ -106,24 +145,15 @@ const reducer = (state, action) => {
   }
 };
 
-const initialState = {
-  state: "play",
-  counter: 10,
-  lives: 3,
-  guess: "",
-  letterBank: getRandomLetters(),
-  wordsGuessed: [],
-  wordsGuessedThisCycle: 0,
-};
-
-function Game() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { lives, counter, guess, wordsGuessed, letterBank } = state;
+function Game({ onGameOver }) {
+  const [state, dispatch] = useReducer(reducer, getInitialState());
+  const { score, lives, counter, guess, wordsGuessed, letterBank } = state;
 
   const handleChange = (e) => {
     dispatch({ type: "update_guess", payload: e.target.value });
   };
 
+  // TODO: Add letter flash on re-render
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch({ type: "tick" });
@@ -133,6 +163,12 @@ function Game() {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (lives === 0) {
+      onGameOver(score);
+    }
+  }, [lives]);
 
   useEffect(() => {});
 
@@ -148,50 +184,100 @@ function Game() {
   };
 
   return (
-    <div>
-      <div>
-        {lives}, {counter}
-      </div>
+    <div className="space-y-2">
+      <div className="text-6xl">{formatTime(counter)}</div>
 
-      <div className="flex">
+      <div className="flex justify-between items-center">
         <div>
-          <h3>Guessed list</h3>
-          <ul>
-            {wordsGuessed.map((guess) => (
-              <li key={guess}>{guess}</li>
+          <ul className="text-3xl h-28 overflow-hidden">
+            {reversed(wordsGuessed).map((guess, i) => (
+              <li key={i}>{guess}</li>
             ))}
           </ul>
         </div>
-
-        <div>
-          <form onSubmit={handleSubmit}>
-            <input className="border" value={guess} onChange={handleChange} />
-          </form>
-
-          <Letters letters={letterBank} />
-        </div>
+        <div className="text-6xl">+{score}</div>
       </div>
 
-      <ToastContainer />
+      <div>
+        <form className="my-6" onSubmit={handleSubmit}>
+          <input
+            className="text-3xl p-6 h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
+            value={guess}
+            onChange={handleChange}
+          />
+        </form>
+
+        <Letters letters={letterBank} />
+      </div>
     </div>
   );
 }
 
 function App() {
-  const [begin, setBegin] = useState(false);
+  const [state, setState] = useState("menu");
+  const [finalScore, setFinalScore] = useState(100);
 
   const handleClick = () => {
-    setBegin(true);
+    setState("play");
   };
 
-  if (begin) {
-    return <Game />;
-  }
+  const handleGameOver = (score) => {
+    setState("game_over");
+    setFinalScore(score);
+  };
+
+  const content = (() => {
+    switch (state) {
+      case "play":
+        return <Game onGameOver={handleGameOver} />;
+
+      case "game_over":
+        return (
+          <div className="prose prose-xl prose-invert">
+            <h2>Game over.</h2>
+            <p>Your final score was +{finalScore}.</p>
+            <button className="font-bold" onClick={handleClick}>
+              Try again?
+            </button>
+          </div>
+        );
+
+      case "menu":
+        return (
+          <div className="prose prose-xl prose-invert">
+            <h1>Shuffle Hussle</h1>
+
+            <h2>How to play</h2>
+
+            <p>
+              Enter as many words as you can using only the letters shown on
+              screen. Each word is worth an amount of score based on its length.
+            </p>
+            <ul>
+              <li>The letters shuffle randomly every 10 seconds.</li>
+              <li>
+                If the letters shuffle and you haven't submitted a word, game
+                over!
+              </li>
+              <li>No duplicate words allowed.</li>
+            </ul>
+
+            <button
+              className="border rounded py-2 px-8 font-bold"
+              onClick={handleClick}
+            >
+              Start
+            </button>
+          </div>
+        );
+    }
+  })();
 
   return (
     <div>
-      How to play: ...
-      <button onClick={handleClick}>Start</button>
+      <div className="max-w-prose mx-auto my-10">{content}</div>
+
+      <ToastContainer position="bottom-left" theme="dark" />
     </div>
   );
 }

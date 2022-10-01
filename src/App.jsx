@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Link,
+  Navigate,
 } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
@@ -104,17 +105,26 @@ const getScore = (word) => {
 
 const reversed = (arr) => arr.slice().reverse();
 
-const formatTime = (sec) => `00:00:${sec > 9 ? sec : "0" + sec}`;
+const padLeft = (pad, n) => {
+  const str = n.toString();
+  return str.length > 1 ? str : `${pad}${str}`;
+};
+
+const formatTime = (sec) => {
+  const minutes = Math.floor(sec / 60);
+  const seconds = sec % 60;
+
+  return `00:${padLeft("0", minutes)}:${padLeft("0", seconds)}`;
+};
 
 const getInitialState = () => ({
   state: "play",
   score: 0,
-  counter: 10,
-  lives: 1,
+  shuffleCounter: 10,
+  timeRemaining: 30,
   guess: "",
   letterBank: getRandomLetters(),
   wordsGuessed: [],
-  wordsGuessedThisCycle: 0,
 });
 
 const reducer = (state, action) => {
@@ -123,29 +133,33 @@ const reducer = (state, action) => {
       return {
         ...state,
         guess: "",
+        timeRemaining: state.timeRemaining + action.payload.length,
         score: state.score + getScore(action.payload),
         wordsGuessed: state.wordsGuessed.concat(action.payload),
-        wordsGuessedThisCycle: state.wordsGuessedThisCycle + 1,
       };
 
     case "tick":
-      const newCount = state.counter - 1;
+      const newCount = state.shuffleCounter - 1;
+      const newTimeRemaining = state.timeRemaining - 1;
 
       if (newCount === 0) {
         return {
           ...state,
-          counter: 10,
+          shuffleCounter: 10,
           letterBank: getRandomLetters(),
-          lives:
-            state.wordsGuessedThisCycle > 0 ? state.lives : state.lives - 1,
-          wordsGuessedThisCycle: 0,
+          timeRemaining: newTimeRemaining,
         };
       } else {
-        return { ...state, counter: state.counter - 1 };
+        return {
+          ...state,
+          shuffleCounter: state.shuffleCounter - 1,
+          timeRemaining: newTimeRemaining,
+        };
       }
 
     case "update_guess":
-      return { ...state, guess: action.payload };
+      const guess = action.payload.trim().toLowerCase();
+      return { ...state, guess };
 
     default:
       console.error("invalid action");
@@ -153,11 +167,31 @@ const reducer = (state, action) => {
   }
 };
 
+const Timer = ({ timeRemaining }) => {
+  let color = "text-slate-200";
+
+  if (timeRemaining < 10) {
+    color = "text-red-500";
+  }
+
+  if (timeRemaining > 30) {
+    color = "text-green-500";
+  }
+
+  return <div className={`text-7xl ${color}`}>{formatTime(timeRemaining)}</div>;
+};
+
 function Game() {
   const [state, dispatch] = useReducer(reducer, getInitialState());
-  const navigate = useNavigate();
   const inputRef = useRef();
-  const { score, lives, counter, guess, wordsGuessed, letterBank } = state;
+  const {
+    score,
+    timeRemaining,
+    shuffleCounter,
+    guess,
+    wordsGuessed,
+    letterBank,
+  } = state;
 
   const handleChange = (e) => {
     dispatch({ type: "update_guess", payload: e.target.value });
@@ -178,13 +212,9 @@ function Game() {
     };
   }, []);
 
-  useEffect(() => {
-    if (lives === 0) {
-      navigate("/gameover", { state: score });
-    }
-  }, [lives]);
-
-  useEffect(() => {});
+  if (timeRemaining === 0) {
+    return <Navigate to="/gameover" state={score} />;
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -194,12 +224,13 @@ function Game() {
       dispatch({ type: "log_valid_guess", payload: guess });
     } else {
       toast.error(error);
+      dispatch({ type: "update_guess", payload: "" });
     }
   };
 
   return (
     <div className="space-y-2">
-      <div className="text-6xl">{formatTime(counter)}</div>
+      <Timer timeRemaining={timeRemaining} />
 
       <div className="flex justify-between items-center">
         <div>
@@ -223,6 +254,7 @@ function Game() {
         </form>
 
         <Letters letters={letterBank} />
+        <div className="text-2xl mt-2">🔁 {padLeft("0", shuffleCounter)}</div>
       </div>
     </div>
   );
@@ -260,16 +292,16 @@ function Home() {
       <h2>How to play</h2>
 
       <p>
-        Enter as many words as you can using only the letters shown on screen.
-        Each word is worth an amount of score based on its length.
+        Enter as many words using only the displayed letters before the timer
+        runs out. Every word entered gives you a tiny bit more breathing room.
+        What's the highest score you can reach?
       </p>
       <ul>
-        <li>The letters shuffle randomly every 10 seconds.</li>
-        <li>
-          If the letters shuffle and you haven't submitted a word, game over!
-        </li>
-        <li>No duplicate words allowed.</li>
-        <li>Earn more points for encorporating harder letters.</li>
+        <li>The game is over once the countdown timer hits 0.</li>
+        <li>Each new word extends the countdown timer.</li>
+        <li>Your letter bank shuffles randomly every 10 seconds.</li>
+        <li>No duplicates allowed!</li>
+        <li>Harder letters = more points.</li>
       </ul>
 
       <button
@@ -302,7 +334,11 @@ function App() {
             <Link className="font-bold" to="/">
               Shuffle Hussle
             </Link>
-            . a ld51 game by{" "}
+            . A{" "}
+            <a className="font-bold" href="https://ldjam.com/">
+              ld51
+            </a>{" "}
+            game by{" "}
             <a className="font-bold" href="https://mgmarlow.com">
               Graham Marlow
             </a>

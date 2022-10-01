@@ -1,5 +1,11 @@
 import { useEffect, useRef, useReducer } from "react";
-import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
+import {
+  useNavigate,
+  useLocation,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
 import "react-toastify/dist/ReactToastify.css";
@@ -250,7 +256,7 @@ function Home() {
   };
 
   return (
-    <div className="prose prose-xl prose-invert">
+    <div className="prose prose-invert">
       <h2>How to play</h2>
 
       <p>
@@ -267,10 +273,10 @@ function Home() {
       </ul>
 
       <button
-        className="border rounded mt-4 py-3 px-8 font-bold text-3xl"
+        className="border rounded mt-4 py-3 px-8 font-bold text-2xl"
         onClick={handleClick}
       >
-        Start
+        Play
       </button>
     </div>
   );
@@ -281,7 +287,7 @@ function App() {
     <div>
       <div className="flex flex-col justify-between min-h-screen">
         <div className="max-w-prose mx-auto my-10">
-          <h1 className="text-6xl mb-10 text-slate-100 font-bold">
+          <h1 className="text-2xl mb-10 text-slate-100 font-bold">
             Shuffle Hussle
           </h1>
           <Routes>
@@ -293,7 +299,10 @@ function App() {
 
         <footer className="p-12">
           <div className="max-w-prose mx-auto">
-            A ld51 game by{" "}
+            <Link className="font-bold" to="/">
+              Shuffle Hussle
+            </Link>
+            . a ld51 game by{" "}
             <a className="font-bold" href="https://mgmarlow.com">
               Graham Marlow
             </a>

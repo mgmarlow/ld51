@@ -4,32 +4,23 @@ import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
 import "react-toastify/dist/ReactToastify.css";
 
+const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
 // Ordered by relative ease
 const vowels = "aeiou".split("");
 const consonants = "bcdfghklmnprsty".split("");
 const extrahard = "vwjqxz".split("");
 
-const hashedWordList = wordList
-  .split("\n")
-  // Words can be any length, just worry about matching letters
-  // .filter((word) => word.length <= 7)
-  .reduce((acc, cur) => {
-    acc[cur.toLowerCase()] = 1;
+const hashedWordList = wordList.split("\n").reduce((acc, cur) => {
+  acc[cur.toLowerCase()] = 1;
 
-    return acc;
-  }, {});
+  return acc;
+}, {});
 
 const wordContainsOnlyLetters = (word, letters) => {
   return word.split("").findIndex((letter) => !letters.includes(letter)) === -1;
 };
 
 const isValidWord = (word, alreadyGuessed, letters) => {
-  // Words can be any length, just worry about matching letters
-  /* if (word.length > 7) {
-   *   return [false, "Too long!"];
-   * }
-   */
-
   if (alreadyGuessed.includes(word)) {
     return [false, "Already guessed!"];
   }
@@ -58,18 +49,22 @@ const sample = (n, arr) => {
   return rst;
 };
 
-// TODO: Only occasionally assign extrahard.
 const getRandomLetters = () => {
-  return [
-    ...sample(2, vowels),
-    ...sample(4, consonants),
-    ...sample(1, extrahard),
-  ];
+  // Guarantee 1 vowel and 2 consonants
+  const base = [...sample(1, vowels), ...sample(2, consonants)];
+
+  return base.concat(
+    // Grab two remaining letters totally randomly
+    sample(
+      2,
+      alphabet.filter((l) => !base.includes(l))
+    )
+  );
 };
 
 const Letter = ({ value }) => {
   return (
-    <div className="bg-slate-600 text-slate-100 rounded inline w-16 h-16 flex justify-center items-center uppercase text-3xl">
+    <div className="bg-slate-600 text-slate-100 rounded inline w-20 h-20 flex justify-center items-center uppercase text-3xl">
       {value}
     </div>
   );

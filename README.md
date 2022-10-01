@@ -1,6 +1,6 @@
 # Shuffle hustle
 
-A simple word game for ld51.
+A simple word game for [ld51](https://ldjam.com/events/ludum-dare/51/shuffle-hustle).
 
 ## How to play
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import wordList from "../data/words.txt?raw";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,7 +24,7 @@ const wordContainsOnlyLetters = (word, letters) => {
   return word.split("").findIndex((letter) => !letters.includes(letter)) === -1;
 };
 
-const isValidWord = (word, alreadyGuessed, letters, _specialLetter) => {
+const isValidWord = (word, alreadyGuessed, letters) => {
   // Words can be any length, just worry about matching letters
   /* if (word.length > 7) {
    *   return [false, "Too long!"];
@@ -34,11 +34,6 @@ const isValidWord = (word, alreadyGuessed, letters, _specialLetter) => {
   if (alreadyGuessed.includes(word)) {
     return [false, "Already guessed!"];
   }
-
-  // TOO HARD!
-  // if (!word.includes(specialLetter)) {
-  //   return [false, `Missing special letter: ${specialLetter}.`];
-  // }
 
   if (!wordContainsOnlyLetters(word, letters)) {
     return [false, "Words can only contain displayed letters."];
@@ -73,35 +68,65 @@ const getRandomLetters = () => {
   ];
 };
 
-const Letters = ({ letters, specialLetter }) => {
-  return (
-    <div>
-      {letters.map((l) => (l === specialLetter ? `(${l})` : l)).join(", ")}
-    </div>
-  );
+const Letters = ({ letters }) => {
+  return <div>{letters.join(", ")}</div>;
 };
 
-function App() {
-  const [count, setCount] = useState(10);
-  const [letterBank, setLetterBank] = useState(getRandomLetters);
-  const [text, setText] = useState("");
-  const [lives, setLives] = useState(3);
-  const [wordsGuessed, setWordsGuessed] = useState([]);
-  const [wordsGuessedThisCycle, setWordsGuessedThisCycle] = useState(0);
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "log_valid_guess":
+      return {
+        ...state,
+        wordsGuessed: state.wordsGuessed.concat(action.payload),
+        wordsGuessedThisCycle: state.wordsGuessedThisCycle + 1,
+      };
 
-  const specialLetter = useMemo(() => {
-    return undefined;
-    // TOO HARD!
-    // return sample(1, letterBank)[0];
-  }, [letterBank]);
+    case "tick":
+      const newCount = state.counter - 1;
+
+      if (newCount === 0) {
+        return {
+          ...state,
+          counter: 10,
+          letterBank: getRandomLetters(),
+          lives:
+            state.wordsGuessedThisCycle > 0 ? state.lives : state.lives - 1,
+          wordsGuessedThisCycle: 0,
+        };
+      } else {
+        return { ...state, counter: state.counter - 1 };
+      }
+
+    case "update_guess":
+      return { ...state, guess: action.payload };
+
+    default:
+      console.error("invalid action");
+      return state;
+  }
+};
+
+const initialState = {
+  state: "play",
+  counter: 10,
+  lives: 3,
+  guess: "",
+  letterBank: getRandomLetters(),
+  wordsGuessed: [],
+  wordsGuessedThisCycle: 0,
+};
+
+function Game() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { lives, counter, guess, wordsGuessed, letterBank } = state;
 
   const handleChange = (e) => {
-    setText(e.target.value);
+    dispatch({ type: "update_guess", payload: e.target.value });
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount((count) => count - 1);
+      dispatch({ type: "tick" });
     }, 1000);
 
     return () => {
@@ -109,29 +134,14 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (count === 0) {
-      setCount(10);
-      setLetterBank(getRandomLetters());
-      if (wordsGuessedThisCycle === 0) {
-        setLives((lives) => lives - 1);
-      }
-      setWordsGuessedThisCycle(0);
-    }
-  }, [count]);
+  useEffect(() => {});
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const [valid, error] = isValidWord(
-      text,
-      wordsGuessed,
-      letterBank,
-      specialLetter
-    );
+    const [valid, error] = isValidWord(guess, wordsGuessed, letterBank);
     if (valid) {
-      setWordsGuessed((words) => words.concat(text));
-      setWordsGuessedThisCycle((n) => n + 1);
+      dispatch({ type: "log_valid_guess", payload: guess });
     } else {
       toast.error(error);
     }
@@ -140,7 +150,7 @@ function App() {
   return (
     <div>
       <div>
-        {lives}, {count}
+        {lives}, {counter}
       </div>
 
       <div className="flex">
@@ -155,14 +165,33 @@ function App() {
 
         <div>
           <form onSubmit={handleSubmit}>
-            <input className="border" value={text} onChange={handleChange} />
+            <input className="border" value={guess} onChange={handleChange} />
           </form>
 
-          <Letters letters={letterBank} specialLetter={specialLetter} />
+          <Letters letters={letterBank} />
         </div>
       </div>
 
       <ToastContainer />
+    </div>
+  );
+}
+
+function App() {
+  const [begin, setBegin] = useState(false);
+
+  const handleClick = () => {
+    setBegin(true);
+  };
+
+  if (begin) {
+    return <Game />;
+  }
+
+  return (
+    <div>
+      How to play: ...
+      <button onClick={handleClick}>Start</button>
     </div>
   );
 }

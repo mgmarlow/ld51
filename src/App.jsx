@@ -1,4 +1,5 @@
 import { useEffect, useRef, useReducer } from "react";
+import { useTransition, animated } from "@react-spring/web";
 import {
   useNavigate,
   useLocation,
@@ -78,13 +79,18 @@ const Letter = ({ value }) => {
 };
 
 const Letters = ({ letters }) => {
-  return (
-    <div className="flex justify-between space-x-4">
-      {letters.map((l) => (
-        <Letter key={l} value={l} />
-      ))}
-    </div>
-  );
+  const transitions = useTransition(letters, {
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+  });
+
+  const content = transitions((style, item) => (
+    <animated.div style={style}>
+      <Letter value={item} />
+    </animated.div>
+  ));
+
+  return <div className="flex justify-between space-x-4">{content}</div>;
 };
 
 const getScore = (word) => {

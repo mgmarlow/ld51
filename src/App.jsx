@@ -270,10 +270,11 @@ function App() {
                 over!
               </li>
               <li>No duplicate words allowed.</li>
+              <li>Earn more points for encorporating harder letters.</li>
             </ul>
 
             <button
-              className="border rounded py-2 px-8 font-bold"
+              className="border rounded mt-4 py-3 px-8 font-bold text-3xl"
               onClick={handleClick}
             >
               Start
@@ -287,7 +288,9 @@ function App() {
     <div>
       <div className="flex flex-col justify-between min-h-screen">
         <div className="max-w-prose mx-auto my-10">
-          <h1 className="text-6xl mb-10 text-slate-100 font-bold">Shuffle Hussle</h1>
+          <h1 className="text-6xl mb-10 text-slate-100 font-bold">
+            Shuffle Hussle
+          </h1>
           {content}
         </div>
 

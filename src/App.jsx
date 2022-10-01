@@ -356,7 +356,12 @@ function App() {
         </footer>
       </div>
 
-      <ToastContainer position="bottom-left" theme="dark" />
+      <ToastContainer
+        position="top-center"
+        autoClose="1500"
+        hideProgressBar={true}
+        theme="dark"
+      />
     </div>
   );
 }

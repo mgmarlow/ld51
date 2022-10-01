@@ -330,7 +330,7 @@ function App() {
       <div className="flex flex-col justify-between min-h-screen">
         <div className="max-w-prose mx-auto my-10">
           <h1 className="text-2xl mb-10 text-slate-100 font-bold">
-            Shuffle Hussle
+            Shuffle Hustle
           </h1>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -342,7 +342,7 @@ function App() {
         <footer className="p-12">
           <div className="max-w-prose mx-auto">
             <Link className="font-bold" to="/">
-              Shuffle Hussle
+              Shuffle Hustle
             </Link>
             . A{" "}
             <a className="font-bold" href="https://ldjam.com/">

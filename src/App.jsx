@@ -243,33 +243,31 @@ function Game() {
   };
 
   return (
-    <div className="space-y-2">
-      <Timer timeRemaining={timeRemaining} />
-
+    <div className="space-y-10">
       <div className="flex justify-between items-center">
-        <div>
-          <ul className="text-3xl h-28 overflow-hidden">
-            {reversed(wordsGuessed).map((guess, i) => (
-              <li key={i}>{guess}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="text-6xl">+{score}</div>
+        <Timer timeRemaining={timeRemaining} />
+        <div className="text-2xl">+{score}</div>
       </div>
 
-      <div>
-        <form className="my-6" onSubmit={handleSubmit}>
-          <input
-            ref={inputRef}
-            className="text-3xl p-6 h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
-            value={guess}
-            onChange={handleChange}
-          />
-        </form>
+      <form onSubmit={handleSubmit}>
+        <input
+          ref={inputRef}
+          className="text-3xl p-6 h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
+          value={guess}
+          onChange={handleChange}
+        />
+      </form>
 
+      <div>
         <Letters letters={letterBank} />
         <div className="text-2xl mt-2">🔁 {padLeft("0", shuffleCounter)}</div>
       </div>
+
+      <ul className="text-3xl max-h-60 overflow-hidden">
+        {reversed(wordsGuessed).map((guess, i) => (
+          <li key={i}>{guess}</li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -29,6 +29,10 @@ const wordContainsOnlyLetters = (word, letters) => {
 };
 
 const isValidWord = (word, alreadyGuessed, letters) => {
+  if (word.length < 2) {
+    return [false, "Words must be two or more letters."];
+  }
+
   if (alreadyGuessed.includes(word)) {
     return [false, "Already guessed!"];
   }

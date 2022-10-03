@@ -1,6 +1,8 @@
 # Shuffle hustle
 
-A simple word game for [ld51](https://ldjam.com/events/ludum-dare/51/shuffle-hustle).
+A tiny word game influenced by NYT's Spelling Bee. My submission for [Ludum Dare 51](https://ldjam.com/events/ludum-dare/51/shuffle-hustle).
+
+Play the game: [https://shuffle-hustle.com](https://shuffle-hustle.com)
 
 ## How to play
 
@@ -11,7 +13,8 @@ you a tiny bit more breathing room.
 What's the highest score you can reach?
 
 - The game is over once the countdown timer hits 0.
-- Each new word extends the countdown timer.
+- Each new word extends the countdown timer (longer words buy you more time).
 - The letter bank shuffles randomly every 10 seconds.
-- No duplicates allowed!
+- Words must be two or more letters.
+- No duplicate words allowed (duplicate letters are fine).
 

@@ -317,9 +317,13 @@ function Home() {
       <p>What's the highest score you can reach?</p>
       <ul>
         <li>The game is over once the countdown timer hits 0.</li>
-        <li>Each new word extends the countdown timer.</li>
+        <li>
+          Each new word extends the countdown timer (longer words buy you more
+          time).
+        </li>
         <li>The letter bank shuffles randomly every 10 seconds.</li>
-        <li>No duplicates allowed!</li>
+        <li>Words must be two or more letters.</li>
+        <li>No duplicate words allowed (duplicate letters are fine).</li>
       </ul>
 
       <button

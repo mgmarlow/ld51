@@ -366,9 +366,10 @@ function App() {
 
       <ToastContainer
         position="top-center"
-        autoClose="1500"
+        autoClose="1000"
         hideProgressBar={true}
         theme="dark"
+        limit={3}
       />
     </div>
   );

@@ -76,7 +76,10 @@ const getRandomLetters = () => {
 
 const Letter = ({ value }) => {
   return (
-    <div className="bg-slate-600 text-slate-100 rounded inline w-20 h-20 flex justify-center items-center uppercase text-3xl">
+    <div
+      className="bg-slate-600 text-slate-100 rounded inline
+      py-4 sm:py-8 flex justify-center items-center uppercase text-3xl"
+    >
       {value}
     </div>
   );
@@ -89,12 +92,14 @@ const Letters = ({ letters }) => {
   });
 
   const content = transitions((style, item) => (
-    <animated.div style={style}>
+    <animated.div className="flex-grow" style={style}>
       <Letter value={item} />
     </animated.div>
   ));
 
-  return <div className="flex justify-between space-x-4">{content}</div>;
+  return (
+    <div className="flex justify-between space-x-4 sm:space-x-8">{content}</div>
+  );
 };
 
 const getScore = (word) => {
@@ -247,8 +252,8 @@ function Game() {
   };
 
   return (
-    <div className="space-y-10">
-      <div className="flex justify-between items-center">
+    <div className="max-w-prose mx-auto space-y-10">
+      <div className="flex flex-col sm:flex-row justify-between items-center">
         <Timer timeRemaining={timeRemaining} />
         <div className="text-2xl">+{score}</div>
       </div>
@@ -278,7 +283,10 @@ function Game() {
 
 function GameOver() {
   const { state } = useLocation();
-  const { score: finalScore, wordsGuessed } = state || {};
+  const { score: finalScore, wordsGuessed } = state || {
+    score: 0,
+    wordsGuessed: [],
+  };
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -286,11 +294,15 @@ function GameOver() {
   };
 
   return (
-    <div className="prose prose-xl prose-invert">
-      <h2>Game over.</h2>
+    <div className="max-w-prose mx-auto prose prose-invert">
+      <h1>Game over.</h1>
       <p>Your finished with a final score of:</p>
       <p className="text-6xl">+{finalScore}</p>
-      <p>You guessed: {wordsGuessed.join(", ")}.</p>
+
+      {wordsGuessed.length > 0 && (
+        <p>You guessed: {wordsGuessed.join(", ")}.</p>
+      )}
+
       <button className="font-bold" onClick={handleClick}>
         Try again?
       </button>
@@ -306,7 +318,7 @@ function Home() {
   };
 
   return (
-    <div className="prose prose-invert">
+    <div className="max-w-prose mx-auto prose prose-invert">
       <h2>How to play</h2>
 
       <p>
@@ -338,36 +350,53 @@ function Home() {
 
 function App() {
   return (
-    <div>
-      <div className="flex flex-col justify-between min-h-screen">
-        <div className="max-w-prose mx-auto my-10">
-          <h1 className="text-2xl mb-10 text-slate-100 font-bold">
+    <div className="flex flex-col h-screen justify-between">
+      <header className="p-4">
+        <div className="max-w-prose mx-auto flex items-center space-x-4">
+          <Link className="text-2xl text-slate-100 font-bold" to="/">
             Shuffle Hustle
-          </h1>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/play" element={<Game />} />
-            <Route path="/gameover" element={<GameOver />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
+          </Link>
+          <Link to="/">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 01-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 01-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 01-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584zM12 18a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Link>
         </div>
+      </header>
 
-        <footer className="p-12">
-          <div className="max-w-prose mx-auto">
-            <Link className="font-bold" to="/">
-              Shuffle Hustle
-            </Link>
-            . A{" "}
-            <a className="font-bold" href="https://ldjam.com/">
-              ld51
-            </a>{" "}
-            game by{" "}
-            <a className="font-bold" href="https://mgmarlow.com">
-              Graham Marlow
-            </a>
-          </div>
-        </footer>
+      <div className="container mx-auto my-10 p-2 flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/play" element={<Game />} />
+          <Route path="/gameover" element={<GameOver />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
       </div>
+
+      <footer className="p-12">
+        <div className="max-w-prose mx-auto">
+          <Link className="font-bold" to="/">
+            Shuffle Hustle
+          </Link>
+          . A{" "}
+          <a className="font-bold" href="https://ldjam.com/">
+            ld51
+          </a>{" "}
+          game by{" "}
+          <a className="font-bold" href="https://mgmarlow.com">
+            Graham Marlow
+          </a>
+        </div>
+      </footer>
 
       <ToastContainer
         position="top-center"

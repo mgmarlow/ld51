@@ -18,3 +18,7 @@ What's the highest score you can reach?
 - Words must be two or more letters.
 - No duplicate words allowed (duplicate letters are fine).
 
+## Kudos
+
+Word list derived from [GNU Aspell](http://aspell.net/).
+

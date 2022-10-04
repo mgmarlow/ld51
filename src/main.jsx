@@ -5,7 +5,7 @@ import App from "./App";
 import "./index.css";
 
 const Router =
-  import.meta.env.VITE_ROUTER === "in_memory" ? MemoryRouter : BrowserRouter;
+  import.meta.env.VITE_BUILD === "standalone" ? MemoryRouter : BrowserRouter;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

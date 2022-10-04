@@ -348,6 +348,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/play" element={<Game />} />
             <Route path="/gameover" element={<GameOver />} />
+            <Route path="*" element={<Home />} />
           </Routes>
         </div>
 

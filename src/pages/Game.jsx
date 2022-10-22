@@ -15,7 +15,7 @@ const Letter = ({ value }) => {
   return (
     <div
       className="bg-slate-600 text-slate-100 rounded inline
-      py-4 sm:py-8 flex justify-center items-center uppercase text-3xl"
+      py-4 sm:py-8 flex justify-center items-center uppercase text-xl md:text-3xl"
     >
       {value}
     </div>
@@ -123,7 +123,6 @@ function Game() {
     inputRef.current?.focus();
   }, []);
 
-  // TODO: Add letter flash on re-render
   useEffect(() => {
     const interval = setInterval(() => {
       dispatch({ type: "tick" });
@@ -168,7 +167,7 @@ function Game() {
       <form onSubmit={handleSubmit}>
         <input
           ref={inputRef}
-          className="text-3xl p-6 h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
+          className="md:text-3xl p-6 md:h-20 bg-zinc-800 border rounded border-slate-200 min-w-full"
           value={guess}
           onChange={handleChange}
         />
@@ -176,10 +175,12 @@ function Game() {
 
       <div>
         <Letters letters={letterBank} />
-        <div className="text-2xl mt-2">🔁 {padLeft("0", shuffleCounter)}</div>
+        <div className="sm:text-xl md:text-2xl mt-2">
+          🔁 {padLeft("0", shuffleCounter)}
+        </div>
       </div>
 
-      <ul className="text-3xl max-h-60 overflow-hidden">
+      <ul className="sm:text-xl md:text-3xl max-h-60 overflow-hidden">
         {reversed(wordsGuessed).map((guess, i) => (
           <li key={i}>{guess}</li>
         ))}

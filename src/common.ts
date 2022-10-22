@@ -6,9 +6,9 @@ const vowels = "aeiou".split("");
 const consonants = "bcdfghklmnprsty".split("");
 const extrahard = "vwjqxz".split("");
 
-export const reversed = (arr) => arr.slice().reverse();
+export const reversed = (arr: string[]) => arr.slice().reverse();
 
-const sample = (n, arr) => {
+const sample = (n: number, arr: any[]) => {
   const rst = [];
   const cp = arr.slice();
 
@@ -21,17 +21,19 @@ const sample = (n, arr) => {
   return rst;
 };
 
-const hashedWordList = wordList.split("\n").reduce((acc, cur) => {
-  acc[cur.toLowerCase()] = 1;
+const hashedWordList = wordList
+  .split("\n")
+  .reduce((acc: Record<string, number>, cur: string) => {
+    acc[cur.toLowerCase()] = 1;
 
-  return acc;
-}, {});
+    return acc;
+  }, {});
 
-const wordContainsOnlyLetters = (word, letters) => {
+const wordContainsOnlyLetters = (word: string, letters: string[]) => {
   return word.split("").findIndex((letter) => !letters.includes(letter)) === -1;
 };
 
-export const getScore = (word) => {
+export const getScore = (word: string) => {
   const base = word.split("").reduce((acc, cur) => {
     if (extrahard.includes(cur)) {
       return acc + 10;
@@ -47,7 +49,11 @@ export const getScore = (word) => {
   return base;
 };
 
-export const isValidWord = (word, alreadyGuessed, letters) => {
+export const isValidWord = (
+  word: string,
+  alreadyGuessed: string[],
+  letters: string[]
+) => {
   if (word.length < 2) {
     return [false, "Words must be two or more letters."];
   }
@@ -67,19 +73,19 @@ export const isValidWord = (word, alreadyGuessed, letters) => {
   }
 };
 
-export const padLeft = (pad, n) => {
+export const padLeft = (pad: string, n: number) => {
   const str = n.toString();
   return str.length > 1 ? str : `${pad}${str}`;
 };
 
-export const formatTime = (sec) => {
+export const formatTime = (sec: number) => {
   const minutes = Math.floor(sec / 60);
   const seconds = sec % 60;
 
   return `00:${padLeft("0", minutes)}:${padLeft("0", seconds)}`;
 };
 
-export const getRandomLetters = () => {
+export const getRandomLetters = (): string[] => {
   // Guarantee 1 vowel and 2 consonants
   const base = [...sample(1, vowels), ...sample(2, consonants)];
 

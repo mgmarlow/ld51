@@ -12,7 +12,7 @@ const Leaderboard = () => {
       <>
         {scores.length > 0 ? (
           <ol className="text-3xl">
-            {scores.map((score, i) => (
+            {scores.map((score: number, i: number) => (
               <li key={i}>{score}</li>
             ))}
           </ol>

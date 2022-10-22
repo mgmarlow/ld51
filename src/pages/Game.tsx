@@ -12,7 +12,7 @@ import {
 } from "../common";
 import Store from "../Store";
 
-const Letter = ({ value }) => {
+const Letter = ({ value }: { value: string }) => {
   return (
     <div
       className="bg-slate-600 text-slate-100 rounded inline
@@ -23,7 +23,7 @@ const Letter = ({ value }) => {
   );
 };
 
-const Letters = ({ letters }) => {
+const Letters = ({ letters }: { letters: string[] }) => {
   const transitions = useTransition(letters, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
@@ -40,7 +40,7 @@ const Letters = ({ letters }) => {
   );
 };
 
-const Timer = ({ timeRemaining }) => {
+const Timer = ({ timeRemaining }: { timeRemaining: number }) => {
   let color = "text-slate-200";
 
   if (timeRemaining < 10) {
@@ -54,7 +54,22 @@ const Timer = ({ timeRemaining }) => {
   return <div className={`text-7xl ${color}`}>{formatTime(timeRemaining)}</div>;
 };
 
-const getInitialState = () => ({
+type Action =
+  | { type: "log_valid_guess"; payload: string }
+  | { type: "tick" }
+  | { type: "update_guess"; payload: string };
+
+interface State {
+  state: string;
+  score: number;
+  shuffleCounter: number;
+  timeRemaining: number;
+  guess: string;
+  letterBank: string[];
+  wordsGuessed: string[];
+}
+
+const getInitialState = (): State => ({
   state: "play",
   score: 0,
   shuffleCounter: 10,
@@ -64,7 +79,7 @@ const getInitialState = () => ({
   wordsGuessed: [],
 });
 
-const reducer = (state, action) => {
+const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case "log_valid_guess":
       return {
@@ -107,7 +122,7 @@ const reducer = (state, action) => {
 function Game() {
   const [state, dispatch] = useReducer(reducer, getInitialState());
   const store = useMemo(() => new Store(), []);
-  const inputRef = useRef();
+  const inputRef = useRef<HTMLInputElement>();
   const {
     score,
     timeRemaining,
@@ -117,12 +132,12 @@ function Game() {
     letterBank,
   } = state;
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: "update_guess", payload: e.target.value });
   };
 
   useEffect(() => {
-    inputRef.current?.focus();
+    inputRef?.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -139,7 +154,7 @@ function Game() {
     return <Navigate to="/gameover" state={{ score, wordsGuessed }} />;
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const [valid, error] = isValidWord(guess, wordsGuessed, letterBank);

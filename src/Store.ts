@@ -2,21 +2,25 @@ const STORAGE_KEY = "scores";
 const MAX_SCORES = 10;
 
 class Store {
+  id: number;
+  _scores: Record<number, { score: number; nWordsGuessed: number }> = {};
+
   constructor() {
     this.id = this.createSessionId();
 
     try {
-      this._scores = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      this._scores =
+        JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
     } catch (e) {
       this._scores = {};
     }
   }
 
-  createSessionId() {
+  createSessionId(): number {
     return Math.floor(new Date().getTime() / 1000);
   }
 
-  saveScore(score, wordsGuessed) {
+  saveScore(score: number, wordsGuessed: string[]) {
     this._scores[this.id] = {
       score,
       nWordsGuessed: wordsGuessed.length,

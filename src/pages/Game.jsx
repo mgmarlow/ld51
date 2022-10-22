@@ -1,4 +1,4 @@
-import { useEffect, useRef, useReducer } from "react";
+import { useMemo, useEffect, useRef, useReducer } from "react";
 import { useTransition, animated } from "@react-spring/web";
 import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -10,6 +10,7 @@ import {
   getRandomLetters,
   formatTime,
 } from "../common";
+import Store from "../Store";
 
 const Letter = ({ value }) => {
   return (
@@ -105,6 +106,7 @@ const reducer = (state, action) => {
 
 function Game() {
   const [state, dispatch] = useReducer(reducer, getInitialState());
+  const store = useMemo(() => new Store(), []);
   const inputRef = useRef();
   const {
     score,
@@ -149,6 +151,8 @@ function Game() {
       if (guess.includes("z") || guess.includes("q") || guess.includes("j")) {
         toast.success("NICE JOB!");
       }
+
+      store.saveScore(state.score, state.wordsGuessed);
 
       dispatch({ type: "log_valid_guess", payload: guess });
     } else {

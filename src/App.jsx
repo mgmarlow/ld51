@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Home from "./pages/Home";
 import GameOver from "./pages/GameOver";
 import Game from "./pages/Game";
+import Leaderboard from "./pages/Leaderboard";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               />
             </svg>
           </Link>
+          <Link to="/scores">Scores</Link>
         </div>
       </header>
 
@@ -35,6 +37,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/play" element={<Game />} />
           <Route path="/gameover" element={<GameOver />} />
+          <Route path="/scores" element={<Leaderboard />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </div>

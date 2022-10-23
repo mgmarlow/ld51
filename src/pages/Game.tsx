@@ -150,6 +150,10 @@ function Game() {
     };
   }, []);
 
+  useEffect(() => {
+    store.saveScore(score, wordsGuessed);
+  }, [store, score, wordsGuessed]);
+
   if (timeRemaining === 0) {
     return <Navigate to="/gameover" state={{ score, wordsGuessed }} />;
   }
@@ -166,8 +170,6 @@ function Game() {
       if (guess.includes("z") || guess.includes("q") || guess.includes("j")) {
         toast.success("NICE JOB!");
       }
-
-      store.saveScore(state.score, state.wordsGuessed);
 
       dispatch({ type: "log_valid_guess", payload: guess });
     } else {
